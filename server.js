@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Member = require('./models/Member');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,19 @@ mongoose.connect('mongodb://localhost:27017/advp', { useNewUrlParser: true, useU
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public'))); // Servindo arquivos estáticos
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/register.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
 
 app.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
@@ -62,7 +76,11 @@ const verifyToken = (req, res, next) => {
 };
 
 app.get('/restricted.html', verifyToken, (req, res) => {
-    res.send('Conteúdo restrito para membros cadastrados');
+    res.sendFile(path.join(__dirname, 'public', 'restricted.html'));
+});
+
+app.get('/events.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'events.html'));
 });
 
 app.listen(PORT, () => {
